@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub每日趋势</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292e;
+            background-color: #f6f8fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px;
+        }
+        .repo-card {
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        .repo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .repo-rank {
+            display: inline-block;
+            background-color: #667eea;
+            color: white;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .repo-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0366d6;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .repo-name:hover {
+            text-decoration: underline;
+        }
+        .repo-description {
+            color: #586069;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .repo-meta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 14px;
+            color: #586069;
+        }
+        .language {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .language-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #f1e05a;
+        }
+        .stars {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .stars-today {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #28a745;
+            font-weight: 600;
+        }
+        .footer {
+            background-color: #f6f8fa;
+            padding: 20px;
+            text-align: center;
+            color: #586069;
+            font-size: 12px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+            .repo-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 GitHub每日趋势</h1>
+            <p>{{ date }}</p>
+        </div>
+        
+        <div class="content">
+            {% for repo in repos %}
+            <div class="repo-card">
+                <div>
+                    <span class="repo-rank">#{{ loop.index }}</span>
+                    <a href="{{ repo.url }}" class="repo-name">{{ repo.name }}</a>
+                </div>
+                
+                <div class="repo-description">
+                    {{ repo.description }}
+                </div>
+                
+                <div class="repo-meta">
+                    <div class="language">
+                        <span class="language-color"></span>
+                        <span>{{ repo.language }}</span>
+                    </div>
+                    <div class="stars">
+                        <span>⭐</span>
+                        <span>{{ repo.stars }} stars</span>
+                    </div>
+                    <div class="stars-today">
+                        <span>📈</span>
+                        <span>+{{ repo.stars_today }} stars today</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="footer">
+            <p>数据来源: GitHub Trending</p>
+            <p>自动发送于 {{ timestamp }}</p>
+        </div>
+    </div>
+</body>
+</html>
