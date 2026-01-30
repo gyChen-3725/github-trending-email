@@ -100,3 +100,48 @@ class QwenProvider(BaseLLMProvider):
                 time.sleep(sleep_time)
         
         return None
+
+
+def summarize_repos(repos: List[Dict]) -> List[Dict]:
+    """为trending项目批量生成AI总结
+    
+    Args:
+        repos: trending项目列表
+        
+    Returns:
+        增强后的项目列表，前N个项目新增 'ai_summary' 字段
+    """
+    from src.config import Config
+    
+    # 检查是否启用AI总结
+    if not Config.ENABLE_AI_SUMMARY:
+        logger.info("AI总结功能未启用，跳过")
+        return repos
+    
+    # 确定要总结的项目数量
+    count = min(Config.AI_SUMMARY_COUNT, len(repos))
+    
+    if count == 0:
+        logger.info("没有项目需要总结")
+        return repos
+    
+    logger.info(f"开始为前 {count} 个trending项目生成AI总结...")
+    
+    # 创建Provider实例
+    provider = QwenProvider()
+    
+    # 批量处理
+    success_count = 0
+    for i in range(count):
+        repo = repos[i]
+        summary = provider.generate_summary(repo)
+        
+        if summary:
+            repo['ai_summary'] = summary
+            success_count += 1
+        else:
+            repo['ai_summary'] = None
+            logger.warning(f"项目 {repo['name']} 总结失败，将使用原始描述")
+    
+    logger.info(f"AI总结完成：{success_count}/{count} 个项目成功")
+    return repos

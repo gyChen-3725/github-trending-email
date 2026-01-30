@@ -87,3 +87,94 @@ def test_qwen_provider_all_retries_fail(mock_sleep, mock_dashscope):
     assert summary is None
     assert mock_dashscope.Generation.call.call_count == 3
     assert mock_sleep.call_count == 2  # 前2次失败后sleep
+
+
+@patch('src.ai_summarizer.QwenProvider')
+def test_summarize_repos_only_first_n(mock_provider_class, monkeypatch):
+    """测试只总结前5个项目"""
+    # 启用AI总结
+    monkeypatch.setenv('ENABLE_AI_SUMMARY', 'true')
+    monkeypatch.setenv('QWEN_API_KEY', 'test-key')
+    
+    # 重新加载config
+    import importlib
+    from src import config
+    importlib.reload(config)
+    
+    from src.ai_summarizer import summarize_repos
+    
+    # Mock provider实例
+    mock_provider = Mock()
+    mock_provider.generate_summary.return_value = "AI总结内容"
+    mock_provider_class.return_value = mock_provider
+    
+    # 创建10个项目
+    repos = [
+        {'name': f'repo{i}', 'description': 'test', 'language': 'Python', 'stars_today': '10'}
+        for i in range(10)
+    ]
+    
+    result = summarize_repos(repos)
+    
+    # 应该调用5次
+    assert mock_provider.generate_summary.call_count == 5
+    
+    # 前5个有ai_summary
+    for i in range(5):
+        assert result[i]['ai_summary'] == "AI总结内容"
+    
+    # 后5个没有ai_summary
+    for i in range(5, 10):
+        assert 'ai_summary' not in result[i]
+
+
+@patch('src.ai_summarizer.QwenProvider')
+def test_summarize_repos_handles_partial_failure(mock_provider_class, monkeypatch):
+    """测试部分项目总结失败的情况"""
+    # 启用AI总结
+    monkeypatch.setenv('ENABLE_AI_SUMMARY', 'true')
+    monkeypatch.setenv('QWEN_API_KEY', 'test-key')
+    
+    # 重新加载config
+    import importlib
+    from src import config
+    importlib.reload(config)
+    
+    from src.ai_summarizer import summarize_repos
+    
+    mock_provider = Mock()
+    # 第1个成功，第2个失败，第3个成功
+    mock_provider.generate_summary.side_effect = [
+        "总结1",
+        None,  # 失败
+        "总结3",
+        "总结4",
+        "总结5"
+    ]
+    mock_provider_class.return_value = mock_provider
+    
+    repos = [{'name': f'repo{i}'} for i in range(5)]
+    
+    result = summarize_repos(repos)
+    
+    assert result[0]['ai_summary'] == "总结1"
+    assert result[1]['ai_summary'] is None
+    assert result[2]['ai_summary'] == "总结3"
+
+
+def test_summarize_repos_when_disabled(monkeypatch):
+    """测试禁用AI总结时直接返回"""
+    monkeypatch.setenv('ENABLE_AI_SUMMARY', 'false')
+    
+    # 重新加载config以应用新的环境变量
+    import importlib
+    from src import config
+    importlib.reload(config)
+    
+    from src.ai_summarizer import summarize_repos
+    
+    repos = [{'name': 'test'}]
+    result = summarize_repos(repos)
+    
+    # 不应添加ai_summary字段
+    assert 'ai_summary' not in result[0]
