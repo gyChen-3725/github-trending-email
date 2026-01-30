@@ -18,6 +18,14 @@ class Config:
     # Trending配置
     TRENDING_LIMIT: int = int(os.getenv('TRENDING_LIMIT', '10'))
     
+    # AI总结功能配置
+    ENABLE_AI_SUMMARY = os.getenv('ENABLE_AI_SUMMARY', 'false').lower() == 'true'
+    QWEN_API_KEY = os.getenv('QWEN_API_KEY', '')
+    QWEN_MODEL = os.getenv('QWEN_MODEL', 'qwen-turbo')
+    AI_SUMMARY_COUNT = int(os.getenv('AI_SUMMARY_COUNT', '5'))
+    AI_MAX_RETRIES = int(os.getenv('AI_MAX_RETRIES', '3'))
+    AI_TIMEOUT = int(os.getenv('AI_TIMEOUT', '30'))
+    
     @classmethod
     def validate(cls) -> None:
         """验证必要的配置项
@@ -40,3 +48,7 @@ class Config:
             raise ValueError(
                 f"缺少必要的配置项: {', '.join(missing_fields)}"
             )
+        
+        # 验证AI总结配置
+        if cls.ENABLE_AI_SUMMARY and not cls.QWEN_API_KEY:
+            raise ValueError("启用AI总结功能时必须设置 QWEN_API_KEY 环境变量")
