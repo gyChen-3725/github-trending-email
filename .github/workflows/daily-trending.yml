@@ -33,7 +33,7 @@ jobs:
           EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
           TRENDING_LIMIT: 10
         run: |
-          python src/main.py
+          python -m src.main
       
       - name: 发送失败通知
         if: failure()
