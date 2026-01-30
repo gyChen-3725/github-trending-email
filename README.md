@@ -118,6 +118,61 @@ pytest tests/ -v
 - **python-dotenv** - 环境变量管理
 - **GitHub Actions** - 自动化运行
 
+## AI总结功能（可选）
+
+启用AI总结功能可为trending项目生成详细的中文解析，帮助快速了解项目核心价值。
+
+### 功能特性
+
+- ✅ 自动为前5个trending项目生成AI总结
+- ✅ 包含项目用途、特点、适用场景、技术亮点
+- ✅ 支持启用/禁用，不影响基础功能
+- ✅ API失败自动降级，确保邮件正常发送
+
+### 如何启用
+
+**1. 获取通义千问API Key**
+
+访问 [阿里云DashScope](https://dashscope.aliyun.com/)：
+1. 注册/登录阿里云账号
+2. 开通DashScope服务
+3. 创建API Key（首次注册赠送免费额度）
+
+**2. 配置GitHub Secrets**
+
+在仓库的 `Settings` → `Secrets and variables` → `Actions` 中添加：
+
+| Secret名称 | 说明 | 示例 |
+|-----------|------|------|
+| `ENABLE_AI_SUMMARY` | 是否启用AI总结 | `true` |
+| `QWEN_API_KEY` | 通义千问API密钥 | `sk-xxxxx...` |
+| `QWEN_MODEL` | 使用的模型（可选） | `qwen-turbo` |
+
+**3. 测试运行**
+
+配置完成后，手动触发一次workflow验证效果。
+
+### 成本说明
+
+- **模型选择**: qwen-turbo（默认，性价比高）
+- **日消耗**: 约0.02元/天
+- **月成本**: 约0.6元/月
+- **年成本**: 约7.2元/年
+
+可随时通过设置 `ENABLE_AI_SUMMARY=false` 关闭功能。
+
+### 效果展示
+
+启用后，邮件中每个trending项目卡片会显示：
+
+```
+🤖 AI深度解析
+这是一个高性能的Web框架，基于Python异步编程构建。
+主要特点包括快速的请求处理、自动API文档生成、类型安全。
+适用于构建RESTful API、微服务后端等场景。
+技术亮点是基于Starlette和Pydantic的现代化架构设计。
+```
+
 ## 常见问题
 
 ### 1. 为什么收不到邮件？
