@@ -53,12 +53,15 @@ def render_email_content(repos: List[Dict]) -> str:
         raise
 
 
-def send_email(repos: List[Dict], subject: Optional[str] = None) -> None:
+def send_email(repos: List[Dict], subject: Optional[str] = None) -> bool:
     """发送HTML邮件
     
     Args:
         repos: 仓库列表
         subject: 邮件主题，默认为 "GitHub每日趋势 - YYYY-MM-DD"
+        
+    Returns:
+        bool: 发送成功返回True，失败抛出异常
         
     Raises:
         ValueError: 配置验证失败时
@@ -99,6 +102,7 @@ def send_email(repos: List[Dict], subject: Optional[str] = None) -> None:
             server.send_message(msg)
             
         logger.info("邮件发送成功！")
+        return True
         
     except ValueError as e:
         logger.error(f"配置验证失败: {e}")
