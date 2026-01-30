@@ -36,6 +36,14 @@ def main():
         
         logger.info(f"成功获取 {len(repos)} 个项目")
         
+        # AI总结增强（可选）
+        if Config.ENABLE_AI_SUMMARY:
+            from src.ai_summarizer import summarize_repos
+            logger.info("AI总结功能已启用，开始生成项目总结...")
+            repos = summarize_repos(repos)
+        else:
+            logger.info("AI总结功能未启用")
+        
         # 发送邮件
         logger.info("正在发送邮件...")
         success = send_email(repos)
