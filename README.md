@@ -6,10 +6,11 @@
 
 - ✅ 每天早上8点（北京时间）自动执行
 - ✅ 获取GitHub trending前10个项目（所有语言）
-- ✅ 精美的HTML邮件格式
+- ✅ **AI智能总结**：自动为前5个项目生成150-200字的深度解析（可选）
+- ✅ 精美的HTML邮件格式，AI总结带专属标识
 - ✅ 通过GitHub Actions自动运行，完全免费
 - ✅ 支持本地测试
-- ✅ 错误重试和日志记录
+- ✅ 错误重试和日志记录，API失败自动降级
 
 ## 效果预览
 
@@ -20,6 +21,7 @@
 - 编程语言
 - 总star数
 - 今日新增star数
+- **🤖 AI深度解析**（可选）：通义千问生成的详细中文总结，包含项目用途、特点、适用场景、技术亮点
 
 ## 快速开始
 
@@ -100,10 +102,13 @@ pytest tests/ -v
 │   ├── main.py                   # 主程序
 │   ├── config.py                 # 配置管理
 │   ├── trending_fetcher.py       # Trending获取
+│   ├── ai_summarizer.py          # AI总结模块（可选）
 │   └── email_sender.py           # 邮件发送
 ├── templates/
-│   └── email_template.html       # 邮件模板
-├── tests/                        # 测试文件
+│   └── email_template.html       # 邮件模板（含AI样式）
+├── tests/                        # 测试文件（含AI测试）
+├── docs/
+│   └── plans/                    # 设计文档
 ├── requirements.txt              # Python依赖
 ├── .env.example                  # 环境变量示例
 └── README.md                     # 项目说明
@@ -116,18 +121,22 @@ pytest tests/ -v
 - **BeautifulSoup4** - HTML解析
 - **Jinja2** - 模板引擎
 - **python-dotenv** - 环境变量管理
+- **dashscope** - 阿里云通义千问SDK（可选）
 - **GitHub Actions** - 自动化运行
 
 ## AI总结功能（可选）
 
-启用AI总结功能可为trending项目生成详细的中文解析，帮助快速了解项目核心价值。
+🎯 **实测效果**：成功为GitHub trending项目生成详细的中文解析，自动识别项目核心价值，大幅提升阅读效率！
+
+启用AI总结功能后，每天的trending邮件将包含通义千问生成的智能分析，帮助您快速了解项目亮点。
 
 ### 功能特性
 
-- ✅ 自动为前5个trending项目生成AI总结
-- ✅ 包含项目用途、特点、适用场景、技术亮点
-- ✅ 支持启用/禁用，不影响基础功能
+- ✅ 自动为前5个trending项目生成150-200字AI总结
+- ✅ 包含项目用途、特点、适用场景、技术亮点（结构化分析）
+- ✅ 支持启用/禁用，不影响基础邮件功能
 - ✅ API失败自动降级，确保邮件正常发送
+- ✅ 智能重试机制（3次，指数退避），提高稳定性
 
 ### 如何启用
 
@@ -197,6 +206,17 @@ schedule:
 ### 4. 邮件发送失败怎么办？
 
 GitHub Actions会在失败时发送通知邮件。查看Actions日志了解详细错误信息。
+
+### 5. AI总结功能异常怎么办？
+
+- 检查 `QWEN_API_KEY` 是否正确配置
+- 确认API Key有足够的剩余额度
+- AI功能失败不会影响邮件发送，只是不显示总结内容
+- 查看Actions日志中的AI相关错误信息
+
+### 6. 如何关闭AI总结功能？
+
+在GitHub Secrets中设置 `ENABLE_AI_SUMMARY=false` 或删除该配置项即可。
 
 ## 开源协议
 
