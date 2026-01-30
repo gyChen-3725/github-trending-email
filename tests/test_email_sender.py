@@ -48,6 +48,49 @@ def test_render_email_content():
     assert '89' in html_content
 
 
+def test_render_email_with_ai_summary():
+    """测试渲染包含AI总结的邮件"""
+    repos = [
+        {
+            'name': 'test/repo',
+            'description': 'Original description',
+            'url': 'https://github.com/test/repo',
+            'language': 'Python',
+            'stars': '1000',
+            'stars_today': '100',
+            'ai_summary': '这是一个优秀的Python项目，提供高性能的数据处理能力。适用于大规模数据分析场景。'
+        }
+    ]
+    
+    html = render_email_content(repos)
+    
+    # 检查AI总结区块存在
+    assert '🤖 AI深度解析' in html
+    assert '这是一个优秀的Python项目' in html
+    assert 'ai-summary' in html
+
+
+def test_render_email_without_ai_summary():
+    """测试没有AI总结时的渲染"""
+    repos = [
+        {
+            'name': 'test/repo',
+            'description': 'Description',
+            'url': 'https://github.com/test/repo',
+            'language': 'Python',
+            'stars': '1000',
+            'stars_today': '100'
+            # 没有 ai_summary 字段
+        }
+    ]
+    
+    html = render_email_content(repos)
+    
+    # 不应包含AI总结区块
+    assert '🤖 AI深度解析' not in html
+
+
+
 def test_render_email_with_empty_repos():
     """测试空数据渲染"""
     repos = []
